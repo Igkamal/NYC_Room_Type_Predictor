@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>NYC Room Type Predictor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-view="form">
+
+<!-- Background layers -->
+<div class="bg" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+<div class="skyline far" id="sky-far-wrap" aria-hidden="true"><svg id="sky-far" viewBox="0 0 1700 260" preserveAspectRatio="none"></svg></div>
+<div class="skyline near" id="sky-near-wrap" aria-hidden="true"><svg id="sky-near" viewBox="0 0 1700 260" preserveAspectRatio="none"></svg></div>
+
+<div class="app">
+
+  <!-- ============ TOP BAR ============ -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">NYC</span>
+      <div class="brand-text">
+        <strong>Room Type Predictor</strong>
+        <span>Airbnb listing classifier</span>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button type="button" class="status-pill" id="api-status" data-state="checking" title="Click to re-check the API">
+        <span class="status-dot"></span><span class="status-text">Checking API…</span>
+      </button>
+      <button type="button" class="icon-btn" id="settings-btn" title="API settings" aria-label="API settings">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M19.4 13a7.5 7.5 0 0 0 .1-1 7.5 7.5 0 0 0-.1-1l2.1-1.6a.5.5 0 0 0 .1-.7l-2-3.5a.5.5 0 0 0-.6-.2l-2.5 1a7.6 7.6 0 0 0-1.7-1l-.4-2.6a.5.5 0 0 0-.5-.4h-4a.5.5 0 0 0-.5.4l-.4 2.6a7.6 7.6 0 0 0-1.7 1l-2.5-1a.5.5 0 0 0-.6.2l-2 3.5a.5.5 0 0 0 .1.7L4.5 11a7.5 7.5 0 0 0 0 2l-2.1 1.6a.5.5 0 0 0-.1.7l2 3.5a.5.5 0 0 0 .6.2l2.5-1a7.6 7.6 0 0 0 1.7 1l.4 2.6a.5.5 0 0 0 .5.4h4a.5.5 0 0 0 .5-.4l.4-2.6a7.6 7.6 0 0 0 1.7-1l2.5 1a.5.5 0 0 0 .6-.2l2-3.5a.5.5 0 0 0-.1-.7L19.4 13Zm-7.4 2.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ============ VIEW 1: FORM ============ -->
+    <section id="view-form" class="view view-form">
+
+      <div class="hero">
+        <span class="hero-tag">Machine learning · NYC Airbnb data</span>
+        <h1>Is it a whole home, a private room, or a <em>shared</em> room?</h1>
+        <p class="hero-sub">Describe any New York listing in three quick steps. A trained model predicts the room type and shows how confident it is.</p>
+        <div class="hero-stats">
+          <div><strong>217</strong><span>neighbourhoods</span></div>
+          <div><strong>5</strong><span>boroughs</span></div>
+          <div><strong>3</strong><span>room types</span></div>
+        </div>
+      </div>
+
+      <div class="wizard glass">
+
+        <div class="wizard-head">
+          <ol class="steps-nav" id="steps-nav">
+            <li class="active" data-go="1"><span class="dot">1</span><span class="lbl">Location</span></li>
+            <li data-go="2"><span class="dot">2</span><span class="lbl">Price &amp; stay</span></li>
+            <li data-go="3"><span class="dot">3</span><span class="lbl">Activity</span></li>
+          </ol>
+          <button type="button" class="link-btn" id="clear-btn">Clear all</button>
+        </div>
+        <div class="progress"><div class="progress-fill" id="progress-fill"></div></div>
+
+        <div class="banner error" id="form-error" hidden></div>
+
+        <form id="predict-form" novalidate>
+
+          <!-- STEP 1 -->
+          <div class="step active" data-step="1">
+            <h2 class="step-title">Where is the listing?</h2>
+            <p class="step-hint">Pick a borough on the map or from the list.</p>
+
+            <div class="borough-map">
+              <svg viewBox="0 0 300 260" id="borough-svg">
+                <path data-borough="Bronx" class="borough-shape" d="M150 10 L230 40 L215 100 L140 95 L120 45 Z"/>
+                <path data-borough="Manhattan" class="borough-shape" d="M138 98 L168 92 L178 200 L150 210 L130 150 Z"/>
+                <path data-borough="Queens" class="borough-shape" d="M180 95 L280 110 L270 200 L182 198 L172 130 Z"/>
+                <path data-borough="Brooklyn" class="borough-shape" d="M150 205 L268 202 L245 250 L165 248 Z"/>
+                <path data-borough="Staten Island" class="borough-shape" d="M40 190 L110 180 L115 245 L55 250 Z"/>
+                <text x="150" y="55" class="borough-label">Bronx</text>
+                <text x="152" y="150" class="borough-label">Manhattan</text>
+                <text x="225" y="152" class="borough-label">Queens</text>
+                <text x="205" y="230" class="borough-label">Brooklyn</text>
+                <text x="78" y="218" class="borough-label">Staten Is.</text>
+              </svg>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="borough">Borough</label>
+                <select id="borough" name="neighbourhood_group" required>
+                  <option value="" disabled selected>Select a borough</option>
+                  <option value="Manhattan">Manhattan</option>
+                  <option value="Brooklyn">Brooklyn</option>
+                  <option value="Queens">Queens</option>
+                  <option value="Bronx">Bronx</option>
+                  <option value="Staten Island">Staten Island</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="neighbourhood">Neighbourhood</label>
+                <select id="neighbourhood" name="neighbourhood" required disabled>
+                  <option value="" disabled selected>Choose a borough first</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="latitude">Latitude</label>
+                <input type="number" id="latitude" name="latitude" step="0.0001" min="-90" max="90" placeholder="40.7128" required>
+              </div>
+              <div class="field">
+                <label for="longitude">Longitude</label>
+                <input type="number" id="longitude" name="longitude" step="0.0001" min="-180" max="180" placeholder="-74.0060" required>
+              </div>
+            </div>
+            <button type="button" id="use-center-btn" class="link-btn" disabled>Use the borough's centre coordinates</button>
+          </div>
+
+          <!-- STEP 2 -->
+          <div class="step" data-step="2">
+            <h2 class="step-title">Price and stay rules</h2>
+            <p class="step-hint">What does a guest pay, and how long must they stay?</p>
+
+            <div class="field">
+              <label for="price">Price per night</label>
+              <div class="money">
+                <span class="money-sign">$</span>
+                <input type="number" id="price" name="price" min="1" step="1" placeholder="150" required>
+                <span class="money-unit">USD</span>
+              </div>
+              <div class="chips" id="price-chips">
+                <button type="button" data-price="45">$45</button>
+                <button type="button" data-price="90">$90</button>
+                <button type="button" data-price="150">$150</button>
+                <button type="button" data-price="250">$250</button>
+                <button type="button" data-price="450">$450</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="minimum_nights">Minimum nights</label>
+              <div class="num">
+                <button type="button" class="num-btn" data-dir="-1" aria-label="Decrease">−</button>
+                <input type="number" id="minimum_nights" name="minimum_nights" min="1" max="365" step="1" placeholder="3" required>
+                <button type="button" class="num-btn" data-dir="1" aria-label="Increase">+</button>
+              </div>
+            </div>
+
+            <div class="field slider-field">
+              <label for="availability_365">
+                <span>Days available per year</span>
+                <span class="slider-readout"><b id="availability-value">183</b> days · <span id="availability-pct">50</span>% of the year</span>
+              </label>
+              <input type="range" id="availability_365" name="availability_365" min="0" max="365" step="1" value="183">
+            </div>
+          </div>
+
+          <!-- STEP 3 -->
+          <div class="step" data-step="3">
+            <h2 class="step-title">Reviews and host</h2>
+            <p class="step-hint">How active is this listing and who runs it?</p>
+
+            <div class="field">
+              <label for="number_of_reviews">Total number of reviews</label>
+              <div class="num">
+                <button type="button" class="num-btn" data-dir="-1" aria-label="Decrease">−</button>
+                <input type="number" id="number_of_reviews" name="number_of_reviews" min="0" step="1" placeholder="24" required>
+                <button type="button" class="num-btn" data-dir="1" aria-label="Increase">+</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="reviews_per_month">Reviews per month</label>
+              <div class="num">
+                <button type="button" class="num-btn" data-dir="-1" aria-label="Decrease">−</button>
+                <input type="number" id="reviews_per_month" name="reviews_per_month" min="0" step="0.1" placeholder="1.2" required>
+                <button type="button" class="num-btn" data-dir="1" aria-label="Increase">+</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="calculated_host_listings_count">Listings owned by this host</label>
+              <div class="num">
+                <button type="button" class="num-btn" data-dir="-1" aria-label="Decrease">−</button>
+                <input type="number" id="calculated_host_listings_count" name="calculated_host_listings_count" min="0" step="1" placeholder="1" required>
+                <button type="button" class="num-btn" data-dir="1" aria-label="Increase">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="wizard-actions">
+            <button type="button" class="ghost-btn" id="example-btn">Fill example</button>
+            <span class="spacer"></span>
+            <button type="button" class="ghost-btn" id="back-btn" hidden>Back</button>
+            <button type="button" class="primary-btn" id="next-btn">Continue</button>
+            <button type="button" class="primary-btn predict" id="predict-btn" hidden>Predict room type</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ============ VIEW 2: LOADING ============ -->
+    <section id="view-loading" class="view view-loading" hidden>
+      <div class="loader">
+        <div class="radar" aria-hidden="true">
+          <span></span><span></span><span></span>
+          <div class="radar-core"></div>
+        </div>
+        <h2>Analyzing your listing</h2>
+        <p id="loading-text" aria-live="polite">Reading the location…</p>
+      </div>
+    </section>
+
+    <!-- ============ VIEW 3: RESULT ============ -->
+    <section id="view-result" class="view view-result" hidden>
+      <div class="result-top">
+        <button type="button" class="ghost-btn" id="edit-btn">← Edit inputs</button>
+        <span class="result-top-label">Prediction result</span>
+      </div>
+
+      <div class="result-grid">
+
+        <div class="verdict glass">
+          <p class="eyebrow">We predict this listing is a</p>
+          <div class="icon-wrap">
+            <div class="burst" id="burst"></div>
+            <div class="verdict-icon" id="verdict-icon"></div>
+          </div>
+          <h2 id="verdict-label" tabindex="-1">—</h2>
+          <p class="blurb" id="verdict-blurb"></p>
+
+          <div class="ring-wrap">
+            <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="ring-bg" cx="60" cy="60" r="52"/>
+              <circle class="ring-fg" id="ring-fg" cx="60" cy="60" r="52"/>
+            </svg>
+            <div class="ring-center">
+              <span class="ring-pct"><b id="ring-pct">0</b>%</span>
+              <small>confidence</small>
+            </div>
+          </div>
+          <p class="confidence-note" id="confidence-note"></p>
+        </div>
+
+        <div class="details">
+          <div class="glass card">
+            <h3>Probability breakdown</h3>
+            <div class="bars" id="bars"></div>
+          </div>
+
+          <div class="glass card">
+            <h3>Your listing</h3>
+            <div class="summary-grid" id="summary"></div>
+          </div>
+
+          <div class="result-actions">
+            <button type="button" class="ghost-btn" id="edit-btn-2">Edit inputs</button>
+            <button type="button" class="primary-btn" id="another-btn">Predict another listing</button>
+          </div>
+          <p class="result-note">This is a statistical estimate learned from past NYC listings, not a guarantee.</p>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="foot">
+    <p>Connected to a FastAPI model server · <button type="button" id="footer-settings-btn" class="link-btn">change API URL</button></p>
+  </footer>
+</div>
+
+<!-- Settings modal -->
+<div class="modal-backdrop" id="modal-backdrop" hidden>
+  <div class="modal">
+    <h3>API settings</h3>
+    <label for="api-url">Backend URL</label>
+    <input type="text" id="api-url" placeholder="http://127.0.0.1:8000">
+    <p class="modal-hint">The address where your FastAPI server (uvicorn main:app) is running.</p>
+    <div class="modal-actions">
+      <button type="button" class="ghost-btn" id="modal-cancel">Cancel</button>
+      <button type="button" class="primary-btn" id="modal-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="script.js"></script>
+</body>
+</html>
