@@ -1,5 +1,10 @@
 # NYC Airbnb Room Type Predictor
 
+# 
+
+Live demo link: https://nyc-room-type-predictor-2-tb2r.onrender.com
+
+
 A machine learning web app that predicts whether a New York Airbnb listing is an **Entire home/apt**, a **Private room**, or a **Shared room**, and shows how confident the model is.
 
 - **Backend:** FastAPI serving a trained scikit-learn pipeline (`Model_Pipeline.pkl`)
