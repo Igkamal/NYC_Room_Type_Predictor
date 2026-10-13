@@ -93,7 +93,7 @@ const LOADING_MESSAGES = [
   "Asking the model…",
 ];
 
-const DEFAULT_API_URL = "https://nyc-room-type-predictor-1qj1.onrender.com";
+const DEFAULT_API_URL = "http://127.0.0.1:8000";
 const TOTAL_STEPS = 3;
 
 // ===========================================================================
